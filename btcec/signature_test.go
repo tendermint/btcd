@@ -294,6 +294,9 @@ func TestRecoverCompact(t *testing.T) {
 }
 
 func TestRFC6979(t *testing.T) {
+	// Test vectors matching Trezor and CoreBitcoin implementations, but with signatures under our encoding scheme.
+	// - https://github.com/trezor/trezor-crypto/blob/9fea8f8ab377dc514e40c6fd1f7c89a74c1d8dc6/tests.c#L432-L453
+	// - https://github.com/oleganza/CoreBitcoin/blob/e93dd71207861b5bf044415db5fa72405e7d8fbc/CoreBitcoin/BTCKey%2BTests.m#L23-L49
 	tests := []struct {
 		key       string
 		msg       string

@@ -38,7 +38,8 @@ var (
 
 // Serialize returns the ECDSA signature as r || s,
 // where both r and s are encoded into 32 byte big endian integers.
-// s is in the smaller of the two signatures.
+// In order to remove malleability,
+// we set s = curve_order - s, if s is greater than curve.Order() / 2.
 func (sig *Signature) Serialize() []byte {
 	// low 'S' malleability breaker
 	sigS := sig.S
