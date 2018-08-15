@@ -95,8 +95,8 @@ func parseSig(sigStr []byte, curve elliptic.Curve, der bool) (*Signature, error)
 	if signature.R.Cmp(curve.Params().N) >= 0 {
 		return nil, errors.New("signature R is >= curve.N")
 	}
-	if signature.S.Cmp(S256().halfOrder) >= 0 {
-		return nil, errors.New("signature S is >= (curve.N) / 2")
+	if signature.S.Cmp(S256().halfOrder) > 0 {
+		return nil, errors.New("signature S is > (curve.N) / 2")
 	}
 
 	return signature, nil
