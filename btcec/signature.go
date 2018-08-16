@@ -15,12 +15,6 @@ import (
 	"math/big"
 )
 
-// Errors returned by canonicalPadding.
-var (
-	errNegativeValue          = errors.New("value may be interpreted as negative")
-	errExcessivelyPaddedValue = errors.New("value is excessively padded")
-)
-
 // Signature is a type representing an ecdsa signature.
 type Signature struct {
 	R *big.Int
@@ -108,21 +102,6 @@ func parseSig(sigStr []byte, curve elliptic.Curve) (*Signature, error) {
 // 32 byte integers, big endian
 func ParseSignature(sigStr []byte, curve elliptic.Curve) (*Signature, error) {
 	return parseSig(sigStr, curve)
-}
-
-// canonicalPadding checks whether a big-endian encoded integer could
-// possibly be misinterpreted as a negative number (even though OpenSSL
-// treats all numbers as unsigned), or if there is any unnecessary
-// leading zero padding.
-func canonicalPadding(b []byte) error {
-	switch {
-	case b[0]&0x80 == 0x80:
-		return errNegativeValue
-	case len(b) > 1 && b[0] == 0x00 && b[1]&0x80 != 0x80:
-		return errExcessivelyPaddedValue
-	default:
-		return nil
-	}
 }
 
 // hashToInt converts a hash value to an integer. There is some disagreement
