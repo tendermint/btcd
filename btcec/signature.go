@@ -57,7 +57,9 @@ func (sig *Signature) Serialize() []byte {
 
 // Verify calls ecdsa.Verify to verify the signature of hash using the public
 // key. It returns true if the signature is valid, false otherwise.
-// This fails on any signature with signatures in non-canonical form.
+// To break malleability, this fails on any signature where the `s` term is
+// negative, where negative is defined as being the lexicographically larger
+// element of s and -s.
 func (sig *Signature) Verify(hash []byte, pubKey *PublicKey) bool {
 	if sig.S.Cmp(S256().halfOrder) > 0 {
 		return false
@@ -73,7 +75,7 @@ func (sig *Signature) IsEqual(otherSig *Signature) bool {
 		sig.S.Cmp(otherSig.S) == 0
 }
 
-func parseSig(sigStr []byte, curve elliptic.Curve, der bool) (*Signature, error) {
+func parseSig(sigStr []byte, curve elliptic.Curve) (*Signature, error) {
 	if len(sigStr) != 64 {
 		return nil, errors.New("malformed signature: not 64 bytes")
 	}
@@ -102,30 +104,10 @@ func parseSig(sigStr []byte, curve elliptic.Curve, der bool) (*Signature, error)
 	return signature, nil
 }
 
-// ParseSignature parses a signature in BER format for the curve type `curve'
-// into a Signature type, perfoming some basic sanity checks.  If parsing
-// according to the more strict DER format is needed, use ParseDERSignature.
+// ParseSignature parses a signature as r || s, with r and s both encoded as
+// 32 byte integers, big endian
 func ParseSignature(sigStr []byte, curve elliptic.Curve) (*Signature, error) {
-	return parseSig(sigStr, curve, false)
-}
-
-// canonicalizeInt returns the bytes for the passed big integer adjusted as
-// necessary to ensure that a big-endian encoded integer can't possibly be
-// misinterpreted as a negative number.  This can happen when the most
-// significant bit is set, so it is padded by a leading zero byte in this case.
-// Also, the returned bytes will have at least a single byte when the passed
-// value is 0.  This is required for DER encoding.
-func canonicalizeInt(val *big.Int) []byte {
-	b := val.Bytes()
-	if len(b) == 0 {
-		b = []byte{0x00}
-	}
-	if b[0]&0x80 != 0 {
-		paddedBytes := make([]byte, len(b)+1)
-		copy(paddedBytes[1:], b)
-		b = paddedBytes
-	}
-	return b
+	return parseSig(sigStr, curve)
 }
 
 // canonicalPadding checks whether a big-endian encoded integer could
