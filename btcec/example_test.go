@@ -8,8 +8,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/tendermint/btcd/btcec"
+	"github.com/tendermint/btcd/chaincfg/chainhash"
 )
 
 // This example demonstrates signing a message with a secp256k1 private key that
@@ -41,7 +41,7 @@ func Example_signMessage() {
 	fmt.Printf("Signature Verified? %v\n", verified)
 
 	// Output:
-	// Serialized Signature: 304402201008e236fa8cd0f25df4482dddbb622e8a8b26ef0ba731719458de3ccd93805b022032f8ebe514ba5f672466eba334639282616bb3c2f0ab09998037513d1f9e3d6d
+	// Serialized Signature: 1008e236fa8cd0f25df4482dddbb622e8a8b26ef0ba731719458de3ccd93805b32f8ebe514ba5f672466eba334639282616bb3c2f0ab09998037513d1f9e3d6d
 	// Signature Verified? true
 }
 
@@ -50,8 +50,8 @@ func Example_signMessage() {
 // raw bytes.
 func Example_verifySignature() {
 	// Decode hex-encoded serialized public key.
-	pubKeyBytes, err := hex.DecodeString("02a673638cb9587cb68ea08dbef685c" +
-		"6f2d2a751a8b3c6f2a7e9a4999e6e4bfaf5")
+	pubKeyBytes, err := hex.DecodeString("03d6b813996554749f3cd86dee54c0" +
+		"415281a9b9912ca9a4ccb24ecdeb357fdcce")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -63,9 +63,9 @@ func Example_verifySignature() {
 	}
 
 	// Decode hex-encoded serialized signature.
-	sigBytes, err := hex.DecodeString("30450220090ebfb3690a0ff115bb1b38b" +
-		"8b323a667b7653454f1bccb06d4bbdca42c2079022100ec95778b51e707" +
-		"1cb1205f8bde9af6592fc978b0452dafe599481c46d6b2e479")
+	sigBytes, err := hex.DecodeString("e17eb1fc368725560c662ad32f57d" +
+		"6279490191ad719de301ca0b4a9c23ef5877c972990e5d9cfe4b5da0961" +
+		"029d59f804e0e80af00167d1b5633432e9880d88")
 
 	if err != nil {
 		fmt.Println(err)
@@ -153,6 +153,10 @@ func Example_decryptMessage() {
 		"00207cf4ac6057406e40f79961c973309a892732ae7a74ee96cd89823913b8b8d650" +
 		"a44166dc61ea1c419d47077b748a9c06b8d57af72deb2819d98a9d503efc59fc8307" +
 		"d14174f8b83354fac3ff56075162")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// Try decrypting the message.
 	plaintext, err := btcec.Decrypt(privKey, ciphertext)
